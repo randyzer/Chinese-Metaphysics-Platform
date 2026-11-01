@@ -49,3 +49,14 @@ def test_example_environment_uses_application_setting_names():
     assert "\nDEBUG=" not in env_example
     assert "DEEPSEEK_API_KEY=" in env_example
     assert "ANTHROPIC_API_KEY=" in env_example
+
+
+def test_readme_documents_complete_docker_workflow():
+    readme = read_repo_file("README.md")
+    assert "### Docker Desktop（推荐）" in readme
+    assert "cp .env.example .env" in readme
+    assert "docker compose up --build -d" in readme
+    assert "docker compose ps" in readme
+    assert "docker compose logs -f app" in readme
+    assert "docker compose down" in readme
+    assert "http://localhost:8888/health" in readme

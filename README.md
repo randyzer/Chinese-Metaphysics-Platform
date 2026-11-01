@@ -382,18 +382,17 @@ cp .env.example .env
 
 ```env
 # ─── 服务器 Server ───────────────────────────────────────────────
-APP_HOST=0.0.0.0          # 监听地址，0.0.0.0 允许局域网访问
-APP_PORT=8888             # 后端端口
-DEBUG=false               # true 时开启详细日志
+APP_ENV=production         # production / development
+APP_HOST=0.0.0.0           # 监听地址，0.0.0.0 允许局域网访问
+APP_PORT=8888              # 对外访问端口
+APP_DEBUG=false            # true 时启用开发调试模式
+BAGUA_LOG_LEVEL=WARNING    # Python 日志级别
 
-# ─── AI 功能 AI Agent ────────────────────────────────────────────
-# 用于 /api/v1/agent/* 的多模型流式解读
-# Required for multi-LLM streaming at /api/v1/agent/*
-ANTHROPIC_API_KEY=sk-ant-...
-
-# ─── CORS 跨域 ───────────────────────────────────────────────────
-# 生产环境请改为实际域名 / Change to your domain in production
-CORS_ORIGINS=["http://localhost:5173"]
+# ─── AI 功能 AI Agent（可选）────────────────────────────────────
+DEEPSEEK_API_KEY=
+DEEPSEEK_BASE_URL=https://api.deepseek.com
+DEEPSEEK_MODEL=deepseek-chat
+ANTHROPIC_API_KEY=
 ```
 
 ### 获取 API Key · Getting an API Key
@@ -406,18 +405,32 @@ CORS_ORIGINS=["http://localhost:5173"]
 > 八字/六爻/奇门/风水/择日五个计算模块**无需** API Key 即可独立运行。  
 > The five calculation modules work **without** an API Key — only the AI streaming features require one.
 
-### 生产部署 · Production Deployment
+### Docker Desktop（推荐）
 
-```env
-APP_HOST=0.0.0.0
-APP_PORT=8888
-DEBUG=false
-CORS_ORIGINS=["https://yourdomain.com"]
-ANTHROPIC_API_KEY=sk-ant-...
+首次运行前，确认 Docker Desktop 已启动：
+
+```bash
+cp .env.example .env
+# 可选：编辑 .env，填入需要使用的 AI 服务密钥
+docker compose up --build -d
 ```
 
-建议在 Nginx 前置反向代理，并通过 `systemd` 或 `supervisor` 管理进程。  
-Recommended: place Nginx as a reverse proxy and manage the process with `systemd` or `supervisor`.
+应用启动后访问：
+
+- Web：<http://localhost:8888>
+- 健康检查：<http://localhost:8888/health>
+- API 文档：<http://localhost:8888/docs>
+
+常用维护命令：
+
+```bash
+docker compose ps
+docker compose logs -f app
+docker compose up --build -d
+docker compose down
+```
+
+`.env` 只保留在本机，不会被 Git 跟踪或复制进镜像。未配置 API Key 时，命理计算模块仍可使用，依赖外部模型的功能不可用。
 
 ---
 
